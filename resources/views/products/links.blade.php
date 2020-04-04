@@ -91,24 +91,18 @@
                                     <button  data-param="test" class="btn btn-success btn-faver" onclick="promotion({{json_encode($product)}})">
                                         <div id="copyTarget" style="opacity: 0;"></div>
                                         立即推广
-                                    </button>g
+                                    </button>
                                 </div>
                                 {{--<button  onclick="promotion({{json_encode($product)}})">  立即推广</button>--}}
                             </div>
                         </div>
 
-                        {{--<div class="bottom">--}}
-                            {{--<div class="buttons">--}}
-                                {{--&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<button  data-param="test" class="btn btn-success btn-faver" onclick="promotion({{json_encode($product)}})">--}}
-                                    {{--<div id="copyTarget" style="opacity: 0;"></div>--}}
-                                    {{--立即推广--}}
-                                {{--</button>--}}
-                            {{--</div>--}}
-                        {{--</div>--}}
                     </div>
                 </div>
             </div>
         @endforeach
+            <input id="foo" value="">
+
     </div>
 
     @if (!count($products))
@@ -123,6 +117,25 @@
 @endsection
 @push('script')
     <script>
+        clipboard = new ClipboardJS(".copy", {
+            text: function (trigger) {
+                trigger.getAttribute('aria-label');
+            }
+        });
+
+        clipboard.on('success', function(e) {
+            console.info('s.Action:', e.action);
+            console.info('s.Text:', e.text);
+            // console.info('s.Trigger:', e.trigger);
+
+            e.clearSelection();
+        });
+
+        clipboard.on('error', function(e) {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+        });
+
         function promotion(product) {
             let data = {
                 'product': product.goods_id,
@@ -131,9 +144,13 @@
 
             axios.post('{{ route('products.share')}}', data).then(function (result) {
 
+                copyValue =   product.goods_name +"\n"+ ' 原价:' + product.min_group_price + ' 元  券后价:' + product.min_price + ' 元'+"\n"
+                    + '抢购链接:' + result.data.short_url;
+                $("#foo").val(copyValue);
+
                 infos =  product.goods_name + ' <br/>  原价:' + product.min_group_price + ' 元<br/>券后价:' + product.min_price + ' 元<br/ >'
-                    + '分享链接:<a>' + result.data.short_url+'</a>';
-                // alert(infos);
+                    + '抢购链接:<a href="'+ result.data.short_url+'">' + result.data.short_url+'</a><button class="copy" data-clipboard-target="#foo">点击复制</button> ';
+
                 swal({
                     html: infos,
                     imageUrl: product.goods_image_url,
