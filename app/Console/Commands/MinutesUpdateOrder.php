@@ -29,9 +29,10 @@ class MinutesUpdateOrder extends Command
     public function handle()
     {
         try {
+
+            Log::info('开始处理');
             //获取db里最新修改时间为起始时间
-            $lastModifyAt = Order::orderby('created_at', 'desc')->value('order_modify_at');
-            $startTime = $lastModifyAt ? strtotime($lastModifyAt) : strtotime('-10 minute');
+            $startTime =  strtotime('-10 minute');
             $page = 1;
 
             $client = new  PopHttpClient();

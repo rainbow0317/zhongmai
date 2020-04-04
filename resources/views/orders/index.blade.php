@@ -28,7 +28,7 @@
 
         @foreach ($incomeOrders as $order)
             <div class="card">
-                <img class="card-img-top" src="{{ $order->imageUrl }}" height="100px">
+                <img class="card-img-top" src="{{ $order->imageUrl }}">
                 <div class="card-body">
                     {{--                        <h4 class="card-title">{{ $order->time }}</h4>--}}
                     <p class="card-text">{{ $order->name }}</p>

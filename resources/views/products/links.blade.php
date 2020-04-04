@@ -101,7 +101,8 @@
                 </div>
             </div>
         @endforeach
-            <input id="foo" value="">
+        <div style="opacity:0"> <input id="foo" value=""></div>
+
 
     </div>
 
