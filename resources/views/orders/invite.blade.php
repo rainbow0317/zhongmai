@@ -7,20 +7,20 @@
     @card
     @slot('header', '我的邀请')
 
-    <ul class="list-group">
-        <li class="list-group-item">
-            <span>总佣金收益:{{ $sum }}元</span>
-            <span>待收收益:{{ $incomeAmount }}元</span>
-            <span>今日收益{{ $todayAmount}}元</span>
-            <span style="float: right"><a href="{{ route('root')}}">回首页</a></span>
-
-        </li>
-    </ul>
+    <div class="card">
+        <div class="card-body">
+            {{--                        <h4 class="card-title">{{ $order->time }}</h4>--}}
+            <p class="card-text">总佣金收益：{{ $sum }}元</p>
+            <p class="card-text">待收收益：{{ $incomeAmount }}元</p>
+            <p class="card-text">今日收益{{ $todayAmount}}元</p>
+            <a href="{{ route('root')}}" class="btn btn-primary">回首页</a>
+        </div>
+    </div>
     <br>
-    <ul class="nav">
-        <li class="list-group-item"><a href="{{ route('orders.income')}}">待收益推广</a></li>
-        <li class="list-group-item"><a href="{{ route('orders.history')}}">已完成推广</a></li>
-        <li class="list-group-item active">邀请收益</li>
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a class="nav-link" href="{{ route('orders.income')}}">待收益</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('orders.history')}}">已完成</a></li>
+        <li class="nav-item"><a class="nav-link active">邀请收益</a></li>
     </ul>
 
     <ul class="list-group">
@@ -29,17 +29,6 @@
         </li>
         <li class="list-group-item">
             <table class="table mb-0">
-                {{--<thead>--}}
-                {{--<tr class="text-center">--}}
-                {{--<th>商品</th>--}}
-                {{--<th class="text-left">时间</th>--}}
-                {{--<th>商品名称</th>--}}
-                {{--<th>实际支付金额</th>--}}
-                {{--<th>状态</th>--}}
-                {{--<th>抽佣</th>--}}
-                {{--<th>失败原因</th>--}}
-                {{--</tr>--}}
-                {{--</thead>--}}
                 <tbody>
                 @foreach ($invites as $order)
                     <tr>
@@ -57,7 +46,7 @@
             </table>
             <div class="my-3">{{ $invites->links() }}</div>
         </li>
-        <li class="list-group-item">邀请用户赚取的佣金超过{{$effectiveInvite}}元,就可以获得{{$inviteReward}}元奖励哦,马上去邀请新人吧!</li>
+        <li class="list-group-item">邀请用户成交一单,就可以获得{{$inviteReward}}元奖励哦,马上去邀请新人吧!</li>
     </ul>
     @endcard
 

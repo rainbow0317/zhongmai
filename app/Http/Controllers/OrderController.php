@@ -30,14 +30,18 @@ class OrderController extends Controller
             ->where('created_at', '>=', date('Y-m-d'))
             ->sum('benefit');
 
+
         //待收收益
         $incomeAmount = Order::where(['user_id' => $user->id, 'promotion_flag' => Order::UN_PROMOTION])
             ->sum('promotion_amount');
 
+        $sumAmount = Benefit::where('user_id', $user->id)
+            ->sum('benefit');
+
 
         $this->amount = [
             'inviteCode' => $user->invitation_code,
-            'sum' => round($user->balance / 100, 2),
+            'sum' => round($sumAmount / 100, 2),
             'todayAmount' => round($todayAmount / 100, 2),
             'incomeAmount' => round($incomeAmount / 100, 2),
         ];
@@ -105,6 +109,7 @@ class OrderController extends Controller
                 ->orderBy('benefits.id', 'desc')
                 ->select([
                     'promote_orders.goods_name as name',
+                    'promote_orders.created_at as time',
                     'promote_orders.order_amount as amount',
                     'promote_orders.image_url as imageUrl',
                     'promote_orders.status as status',
@@ -146,7 +151,7 @@ class OrderController extends Controller
 
             $invites = Invite::leftJoin('users', 'users.id', '=', 'invite_promotion.invite_uid')
                 ->where('user_id', $user->id)
-                ->select(['users.name as name', 'invite_promotion.benefit as benefit'])
+                ->select(['users.phone as name', 'invite_promotion.benefit as benefit'])
                 ->orderBy('invite_promotion.id', 'desc')
                 ->paginate();
 
@@ -178,7 +183,7 @@ class OrderController extends Controller
 
         return view('orders.withdraw', [
             'sum' => round($user->balance / 100, 2),
-            'name' => $user->name,
+            'name' => $user->phone,
             'withdraws' => $list,
         ]);
     }

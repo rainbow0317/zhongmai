@@ -7,13 +7,15 @@
     @card
     @slot('header', '我的账户')
 
+    <div class="card">
+        <div class="card-body">
+            {{--                        <h4 class="card-title">{{ $order->time }}</h4>--}}
+            <p class="card-text">我的账户:{{ $name }}</p>
+            <p class="card-text">我的余额:{{ $sum }}元 </p>
+            <a href="{{ route('root')}}" class="btn btn-primary">回首页</a>
+        </div>
+    </div>
     <ul class="list-group">
-        <li class="list-group-item">
-            <span> 我的账户:{{ $name }} </span>
-            <span> 我的余额:{{ $sum }}元 </span>
-            <span style="float: right"><a href="{{ route('root')}}">回首页</a></span>
-
-        </li>
         <li class="list-group-item">请输入提现金额: <input id="amount" value="{{$sum}}">
             <button class="btn" onclick="withdraw()">点击提现</button>
         </li>

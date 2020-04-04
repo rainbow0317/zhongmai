@@ -144,7 +144,7 @@ class ProductController extends Controller
 
             //添加至分享信息表
             Share::create($order);
-            $order['short_url'] = $data['short_url'];
+            $order['short_url'] = $data['we_app_web_view_short_url'];
 
             return $order;
         } catch (\Exception $exception) {

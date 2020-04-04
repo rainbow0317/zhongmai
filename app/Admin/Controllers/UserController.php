@@ -39,7 +39,7 @@ class UserController extends Controller
 
         $grid->id('ID');
         $grid->name('姓名');
-        $grid->email('E-mail');
+        $grid->email('手机号');
         $grid->email_verified_at('是否驗證E-mail')->display(function ($value) {
             return $value ? '是' : '否';
         });

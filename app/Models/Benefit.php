@@ -31,8 +31,8 @@ class Benefit extends Model
     public static function getTypeDes($status)
     {
         $statusArray = [
-            1 => '直接抽佣',
-            2 => '上级抽佣',
+            1 => '佣金',
+            2 => '抽佣',
         ];
 
         return Arr::get($statusArray, $status, '状态未知,请稍后再试');
