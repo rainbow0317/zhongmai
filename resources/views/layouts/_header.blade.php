@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
-        <a class="navbar-brand" href="{{ route('root') }}">{{ config('app.name') }}</a>
+        <a class="navbar-brand" href="{{ route('root') }}" style="text-decoration:underline">{{ config('app.name') }}</a>
         {{--<div class="collapse navbar-collapse" id="navbarSupportedContent">--}}
         <ul class="navbar-nav align-items-lg-center ml-auto">
             @guest
@@ -13,16 +13,16 @@
             @else
 
                 <li class="nav-item">
-                    <a class="navbar-brand" href="{{ route('orders.income') }}" class="dropdown-item">我的推广</a>
+                    <a class="navbar-brand" href="{{ route('orders.income') }}" style="text-decoration:underline">我的推广</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="navbar-brand" class="dropdown-item"
-                       href="{{route('users.withdraw')}}">我的账户:{{ Auth::user()->balance ?round(Auth::user()->balance/100,2): 0 }}
+                    <a class="navbar-brand"
+                       href="{{route('users.withdraw')}}" style="text-decoration:underline">我的账户:{{ Auth::user()->balance ?round(Auth::user()->balance/100,2): 0 }}
                         元 </a>
                 </li>
                 <li>
-                    <a class="nav-link" href="{{ route('logout') }}" class="dropdown-item"
+                    <a class="nav-link" href="{{ route('logout') }}" style="text-decoration:underline"
                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         退出登录
                     </a>

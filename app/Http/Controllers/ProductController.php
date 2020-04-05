@@ -31,7 +31,7 @@ class ProductController extends Controller
             } else {
                 $current_page = 1;
             }
-            $total = 10000000;//商品总数(分页用,不知道三方有多少商品,所以不显示最后几页,所以总数写的大一些)
+            $total = 1000000;//商品总数(分页用,不知道三方有多少商品,所以不显示最后几页,所以总数写的大一些)
 
             //是否团长
             $leaderFlag = Auth::user()->level_relation == 0;
