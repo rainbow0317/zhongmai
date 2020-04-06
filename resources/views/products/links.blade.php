@@ -129,6 +129,7 @@
         clipboard.on('success', function(e) {
             console.info('s.Action:', e.action);
             console.info('s.Text:', e.text);
+            $('.copy').html('复制成功')
             // console.info('s.Trigger:', e.trigger);
 
             e.clearSelection();
@@ -151,7 +152,7 @@
                     + '抢购链接:<a href="'+ result.data.short_url+'">' + result.data.short_url+'</a>';
                 $("#foo").html(infos);
 
-               infos = infos +'<br><button class="copy" data-clipboard-target="#foo">点击复制文案</button> '
+               infos = infos +'<br><button class="copy btn btn-light" data-clipboard-target="#foo">点击复制文案</button> '
 
                 swal({
                     html: infos,

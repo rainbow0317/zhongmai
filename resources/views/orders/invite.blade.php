@@ -25,7 +25,7 @@
 
     <ul class="list-group">
         <li class="list-group-item">我的邀请链接: <input id="foo" value="{{$inviteLink}}">
-            <button class="btn" data-clipboard-target="#foo">点击复制</button>
+            <button class="copy btn btn-light" data-clipboard-target="#foo">点击复制</button>
         </li>
         <li class="list-group-item">
             <table class="table mb-0">
@@ -54,7 +54,16 @@
 @push('script')
     <script>
         $(function() {
-            new ClipboardJS('.btn');
+            clipboard= new ClipboardJS('.copy');
+
+            clipboard.on('success', function(e) {
+                console.info('s.Action:', e.action);
+                console.info('s.Text:', e.text);
+                $('.copy').html('复制成功')
+                // console.info('s.Trigger:', e.trigger);
+
+                e.clearSelection();
+            });
         })
     </script>
 @endpush
