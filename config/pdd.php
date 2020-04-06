@@ -8,7 +8,7 @@ return [
 
     'pdd_pid' => '9696763_133721040', //拼多多推广位id
 
-    'effective_invite' => '100', //有效邀请门槛金额 单位:分
+    'effective_invite' => '0', //有效邀请门槛金额 单位:分
 
     'invite_reward' => '100' //邀请奖励 单位:分
 

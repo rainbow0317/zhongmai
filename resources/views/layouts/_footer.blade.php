@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row py-3">
       <div class="col-lg">
-        联系我们  :  <img src="{{ asset('images/kefu.jpg') }}"  width="60px" class="img-responsive .img-rounded" alt="客服微信">
+        官方客服微信:15612660376
       </div>
 
       <div class="col-lg text-lg-right">
