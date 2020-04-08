@@ -16,7 +16,6 @@ class Order extends Model
     const STATUS_FINISH = 5;
     const STATUS_NO_PROMOTION = 8;
 
-    const PROMOTED_FLAG_FINISH = 1;
     const UN_PROMOTION = 0;
 
     protected $table = 'promote_orders';

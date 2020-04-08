@@ -26,7 +26,6 @@
     </ul>
 
     <ul class="list-group">
-        <li class="list-group-item">
 
             @foreach ($orders as $order)
                 <div class="card">
@@ -48,7 +47,6 @@
                 </div>
             @endif
             <div class="my-3">{{ $orders->links() }}</div>
-        </li>
     </ul>
 
 

@@ -12,6 +12,8 @@ class Benefit extends Model
     const  TYPE_SUPERIOR = 2;
     const  TYPE_INVITE = 3;
 
+    const STATUS_ING=0;
+    const STATUS_FINISH=1;
     protected $table = 'benefits';
 
 //    protected $dateFormat = 'U';

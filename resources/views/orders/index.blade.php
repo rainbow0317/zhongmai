@@ -40,13 +40,10 @@
             </div>
         @endforeach
         @if (!count($incomeOrders))
-            <div class="card">
-                <div class="card-body">暂无信息</div>
-
-            </div>
+                <div class="card">
+                    <div class="card-body">暂无信息</div>
+                </div>
             @endif
-            </tbody>
-            </table>
     </ul>
     <div class="my-3">{{ $incomeOrders->links() }}</div>
 

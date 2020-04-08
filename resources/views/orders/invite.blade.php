@@ -33,7 +33,12 @@
                 @foreach ($invites as $order)
                     <tr>
                         <td class="product-info">邀请用户:{{ $order->name }}</td>
-                        <td class="product-info">奖励:{{ intval($order->benefit/100) }}元</td>
+                        @if ($order->benefit)
+                            <td class="product-info"> @if ($order->status==1)已到账@else 即将到账@endif:{{ intval($order->benefit/100) }}元
+                            </td>
+                        @else
+                            <td class="product-info">邀请用户还没有成交订单</td>
+                        @endif
                     </tr>
                 @endforeach
                 @if (!count($invites))
@@ -53,10 +58,10 @@
 @endsection
 @push('script')
     <script>
-        $(function() {
-            clipboard= new ClipboardJS('.copy');
+        $(function () {
+            clipboard = new ClipboardJS('.copy');
 
-            clipboard.on('success', function(e) {
+            clipboard.on('success', function (e) {
                 console.info('s.Action:', e.action);
                 console.info('s.Text:', e.text);
                 $('.copy').html('复制成功')

@@ -11,5 +11,8 @@ class Invite extends Model
 
     protected $guarded = [];
 
+    const STATUS_ING=0;
+    const STATUS_FINISH=1;
+
 
 }

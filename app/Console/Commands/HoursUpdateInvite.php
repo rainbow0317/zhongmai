@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Benefit;
 use App\Models\Invite;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -25,37 +26,41 @@ class HoursUpdateInvite extends Command
     {
 
         try {
+            DB::connection()->enableQueryLog();
             //todo 目前只有二级分类.level_relation为父id,可直接使用,后期若层级增加需额外处理
-            //todo 手动提现时流程很长,可直接通过balance获取用户收益,接入自动提现后,需修改为根据benefits来获取用户历史收益
-            $invitedList = User::where('level_relation', '!=', 0)->get(['id', 'level_relation', 'balance']);
-            $effectiveInvite = config('pdd.effective_invite');
-            $inviteReward = config('pdd.invite_reward');
+            $invitedList = Benefit::where('level_relation', '!=', 0)->get(['user_id', 'level_relation', 'benefit','status']);
+            $effectiveInvite = config('pdd.effective_invite');//有效邀请金额
+            $inviteReward = config('pdd.invite_reward'); //邀请奖励金额
 
             foreach ($invitedList as $item) {
-                if ($item->balance > $effectiveInvite) {
 
-//                    DB::connection()->enableQueryLog();
+                if ($item->benefit >= $effectiveInvite) {
 
-                    $isInvited = Invite::where([
+
+
+                    $invit = Invite::firstOrCreate([
                         'user_id' => $item->level_relation,
-                        'invite_uid' => $item->id,
-                    ])->first();
+                        'invite_uid' => $item->user_id
+                    ], [
+                        'status' => Invite::STATUS_ING,
+                        'benefit' => $inviteReward
+                    ]);
 
-                    if (!$isInvited) {
+                    if ($item->status == Benefit::STATUS_FINISH && $invit->status == Invite::STATUS_ING) {
                         DB::transaction(function () use ($item, $inviteReward) {
-                            Invite::create([
+
+                            Invite::where([
                                 'user_id' => $item->level_relation,
-                                'invite_uid' => $item->id,
-                                'benefit' => $inviteReward,
-                            ]);
+                                'invite_uid' => $item->user_id
+                            ])->update(['status'=>Invite::STATUS_FINISH]);
 
                             User::where('id', $item->level_relation)->increment('balance', $inviteReward);
 
-                            Log::info('邀请奖励:邀请人:' . $item->level_relation . '被邀请人:' . $item->id);
+                            Log::info('邀请奖励:邀请人:' . $item->level_relation . '被邀请人:' . $item->usere_id);
                         });
                     }
 
-//                    Log::info(DB::getQueryLog());
+                    Log::info(DB::getQueryLog());
                 }
             }
 

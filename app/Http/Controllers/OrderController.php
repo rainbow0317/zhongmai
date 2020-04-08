@@ -27,15 +27,15 @@ class OrderController extends Controller
 
         //今日收益
         $todayAmount = Benefit::where('user_id', $user->id)
-            ->where('created_at', '>=', date('Y-m-d'))
+            ->where('updated_at', '>=', date('Y-m-d'))
             ->sum('benefit');
 
 
         //待收收益
-        $incomeAmount = Order::where(['user_id' => $user->id, 'promotion_flag' => Order::UN_PROMOTION])
-            ->sum('promotion_amount');
+        $incomeAmount = Benefit::where(['user_id' => $user->id, 'status' => Benefit::STATUS_ING])
+            ->sum('benefit');
 
-        $sumAmount = Benefit::where('user_id', $user->id)
+        $sumAmount = Benefit::where(['user_id'=>$user->id,'status'=>Benefit::STATUS_FINISH])
             ->sum('benefit');
 
 
@@ -56,31 +56,34 @@ class OrderController extends Controller
     public function income()
     {
         try {
-            DB::connection()->enableQueryLog();  // 开启QueryLog
+//            DB::connection()->enableQueryLog();  // 开启QueryLog
 
             $userId = Auth::user()->id;
 
             //待收益推广
-            $incomOrders = Order::where(['user_id' => $userId, 'promotion_flag' => Order::UN_PROMOTION])
-                ->orderBy('promote_orders.id', 'desc')
-                ->select([
-                    'id',
-                    'goods_name as name',
-                    'order_create_time as time',
-                    'order_amount as amount',
-                    'status',
-                    'promotion_amount as promotion',
-                    'image_url as imageUrl',
-                    'promotion_flag as flag',
-                    'fail_reason as failReason',
+            $incomOrders = Benefit::leftJoin('promote_orders', 'promote_orders.id', '=', 'benefits.order_id')
+                ->where([
+                    'benefits.user_id'=>$userId,
+                    'benefits.status'=>Benefit::STATUS_ING
                 ])
-                ->paginate(1);
+                ->orderBy('benefits.id', 'desc')
+                ->select([
+                    'promote_orders.goods_name as name',
+                    'promote_orders.created_at as time',
+                    'promote_orders.order_amount as amount',
+                    'promote_orders.image_url as imageUrl',
+                    'promote_orders.status as status',
+                    'benefits.benefit as benefit',
+                    'benefits.type as type',
 
-            Log::info(DB::getQueryLog());
+                ])
+                ->paginate();
+
+//            Log::info(DB::getQueryLog());
 
             //处理前台数据显示
             foreach ($incomOrders as &$order) {
-                $order->promotion = round($order->promotion / 100, 2);
+                $order->promotion = round($order->benefit / 100, 2);
                 $order->amount = round($order->amount / 100, 2);
                 $order->statusDesc = Order::getStatusDes($order->status);
             }
@@ -105,7 +108,10 @@ class OrderController extends Controller
 
             //已完成推广'users.id', '=', 'invite_promotion.invite_uid'
             $orders = Benefit::leftJoin('promote_orders', 'promote_orders.id', '=', 'benefits.order_id')
-                ->where('benefits.user_id', $userId)
+                ->where([
+                    'benefits.user_id'=>$userId,
+                    'benefits.status'=>Benefit::STATUS_FINISH
+                ])
                 ->orderBy('benefits.id', 'desc')
                 ->select([
                     'promote_orders.goods_name as name',
@@ -149,9 +155,9 @@ class OrderController extends Controller
             }
             $inviteLink = env('APP_URL') . '/register?' . $user->invitation_code;
 
-            $invites = Invite::leftJoin('users', 'users.id', '=', 'invite_promotion.invite_uid')
-                ->where('user_id', $user->id)
-                ->select(['users.phone as name', 'invite_promotion.benefit as benefit'])
+            $invites = User::leftJoin('invite_promotion','users.id', '=', 'invite_promotion.invite_uid')
+                ->where('level_relation', $user->id)
+                ->select(['users.phone as name', 'invite_promotion.benefit as benefit','invite_promotion.status as status'])
                 ->orderBy('invite_promotion.id', 'desc')
                 ->paginate();
 
