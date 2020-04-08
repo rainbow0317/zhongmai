@@ -19,7 +19,7 @@
     <br>
     <ul class="nav nav-pills">
         <li class="nav-item"><a class="nav-link" href="{{ route('orders.income')}}">待收益</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('orders.history')}}">已完成</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('orders.history')}}">历史收益</a></li>
         <li class="nav-item"><a class="nav-link active">邀请收益</a></li>
     </ul>
 

@@ -19,7 +19,7 @@
     <br>
     <ul class="nav nav-pills">
         <li class="nav-item"><a class="nav-link active">待收益</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('orders.history')}}">已完成</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('orders.history')}}">历史收益</a></li>
 
         @if ($inviteCode)
             <li class="nav-item"><a class="nav-link" href="{{ route('orders.invite')}}">邀请收益</a></li>@endif
@@ -33,7 +33,8 @@
                     {{--                        <h4 class="card-title">{{ $order->time }}</h4>--}}
                     <p class="card-text">{{ $order->name }}</p>
                     <p class="card-text">{{ $order->time }} {{ $order->statusDesc}}</p>
-                    <p class="card-text"> 待收益:{{$order->promotion}}元</p>
+                    <p class="card-text"> @if ($order->fail_reason) {{ $order->fail_reason}} @else 待收益:
+                        :{{$order->promotion}}元@endif</p>
 
                     {{--<a href="#" class="btn btn-primary">See Profile</a>--}}
                 </div>

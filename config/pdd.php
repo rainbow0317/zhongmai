@@ -2,7 +2,7 @@
 
 return [
 
-    'promotion_rate' => 0.5, //分销抽佣
+    'promotion_rate' => 0.7, //分销抽佣
 
     'level_promotion_rate' => 0.05, //上级抽佣
 
