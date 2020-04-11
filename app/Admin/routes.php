@@ -2,7 +2,7 @@
 
 use Illuminate\Routing\Router;
 
-Admin::registerAuthRoutes();
+Admin::routes();
 
 Route::group([
     'prefix'        => config('admin.route.prefix'),
@@ -10,7 +10,7 @@ Route::group([
     'middleware'    => config('admin.route.middleware'),
 ], function (Router $router) {
 
-    $router->get('/', 'HomeController@index');
+    $router->get('/', 'HomeController@index')->name('admin.home');
 
     $router->get('users', 'UserController@index');
 
@@ -19,5 +19,8 @@ Route::group([
     $router->post('orders/{order}', 'OrderController@ship')->name('admin.orders.ship');
     $router->post('orders/{order}/refund', 'OrderController@handleRefund')->name('admin.orders.handle_refund');
     $router->resource('orders', 'OrderController')->names('admin.orders')->only('index', 'show');
+
+    $router->resource('shares', 'ShareController')->names('admin.shares')->only('index', 'show');
+    $router->resource('withdraws', 'WithdrawController')->names('admin.withdraws')->only('index', 'show');
 
 });

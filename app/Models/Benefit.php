@@ -30,6 +30,11 @@ class Benefit extends Model
         return $this->hasOne(Order::class, 'id', 'order_id');
     }
 
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
     public static function getTypeDes($status)
     {
         $statusArray = [

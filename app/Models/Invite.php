@@ -11,8 +11,12 @@ class Invite extends Model
 
     protected $guarded = [];
 
-    const STATUS_ING=0;
-    const STATUS_FINISH=1;
+    const STATUS_ING = 0;
+    const STATUS_FINISH = 1;
 
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 
 }

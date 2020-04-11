@@ -9,7 +9,7 @@ Route::middleware('auth')->group(function () {
 
         // 分享
         Route::post('products/share', 'ProductController@share')->name('products.share');
-        Route::get('products/', 'ProductController@index')->name('products.index');
+
 
         //我的订单
         Route::get('orders/income', 'OrderController@income')->name('orders.income');
@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
 
     });
 });
+Route::get('products/', 'ProductController@index')->name('products.index');
 
 
 
