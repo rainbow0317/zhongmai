@@ -74,6 +74,7 @@ class OrderController extends Controller
                     'promote_orders.image_url as imageUrl',
                     'promote_orders.status as status',
                     'benefits.benefit as benefit',
+                    'promote_orders.fail_reason as fail_reason',
                     'benefits.type as type',
 
                 ])
