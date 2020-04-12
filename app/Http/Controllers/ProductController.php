@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Selects;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use App\Models\Share;
@@ -57,6 +58,13 @@ class ProductController extends Controller
             $contents = Arr::get($client->getRes($request), 'goods_search_response', []);
             $list = Arr::get($contents, 'goods_list', []);
 
+            //选品获取
+            $selectList = Selects::orderBy('id','desc')->limit(2)->get()->toArray();
+
+            if ($selectList) {
+                $list = array_merge($selectList, $list);
+            }
+
             $res = [];
             foreach ($list as $key => $val) {
                 $res[$key]['goods_id'] = $val['goods_id'];
@@ -75,9 +83,9 @@ class ProductController extends Controller
                 $res[$key]['promotion'] = round($promotion / 100, 2);
 
                 $res[$key]['min_group_price'] = round($val['min_group_price'] / 100, 2);
-                $res[$key]['min_normal_price'] = round($val['min_normal_price'] / 100, 2);
                 $res[$key]['coupon_discount'] = intval($val['coupon_discount'] / 100);
                 $res[$key]['min_price'] = round($minPrice / 100, 2);
+                $res[$key]['text'] = Arr::get($val,'text');
             }
 
             $res = new LengthAwarePaginator($res, $total, $perPage, $current_page, [

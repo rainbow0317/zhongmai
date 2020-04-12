@@ -2,16 +2,15 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\Product\Select;
+use App\Admin\Actions\Withdraw\Check;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ProductEditRequest;
-use App\Http\Requests\Admin\ProductRequest;
 use App\Models\Product;
+use App\Models\Share;
+use App\Models\Withdraw;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Show;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -20,113 +19,15 @@ class ProductController extends Controller
     /**
      * Index interface.
      *
-     * @param  \Encore\Admin\Layout\Content  $content
+     * @param  \Encore\Admin\Layout\Content $content
      * @return \Encore\Admin\Layout\Content
      */
     public function index(Content $content)
     {
         return $content
-            ->header('商品列表')
-            ->description('description')
+            ->header('选品管理')
             ->body($this->grid());
-    }
 
-    /**
-     * Show interface.
-     *
-     * @param  int  $id
-     * @param  \Encore\Admin\Layout\Content  $content
-     * @return \Encore\Admin\Layout\Content
-     */
-    public function show($id, Content $content)
-    {
-        return $content
-            ->header('商品')
-            ->description('description')
-            ->body($this->detail($id));
-    }
-
-    /**
-     * Create interface.
-     *
-     * @param  \Encore\Admin\Layout\Content  $content
-     * @return \Encore\Admin\Layout\Content
-     */
-    public function create(Content $content)
-    {
-        return $content
-            ->header('新增商品')
-            ->description('description')
-            ->body($this->form());
-    }
-
-    /**
-     * Edit interface.
-     *
-     * @param  int  $id
-     * @param  \Encore\Admin\Layout\Content  $content
-     * @return \Encore\Admin\Layout\Content
-     */
-    public function edit($id, Content $content)
-    {
-        return $content
-            ->header('編輯商品')
-            ->description('description')
-            ->body($this->form($id));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\Admin\ProductRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(ProductRequest $request)
-    {
-        $this->save($request);
-
-        admin_toastr(trans('admin.save_succeeded'));
-
-        return redirect(admin_url('products'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\Admin\ProductEditRequest  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(ProductEditRequest $request, $id)
-    {
-        $this->save($request, $id);
-
-        admin_toastr(trans('admin.update_succeeded'));
-
-        return redirect(admin_url('products'));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy($id)
-    {
-        if (Product::destroy($id)) {
-            $data = [
-                'status' => true,
-                'message' => trans('admin.delete_succeeded'),
-            ];
-        } else {
-            $data = [
-                'status' => false,
-                'message' => trans('admin.delete_failed'),
-            ];
-        }
-
-        return response()->json($data);
     }
 
     /**
@@ -138,143 +39,88 @@ class ProductController extends Controller
     {
         $grid = new Grid(new Product);
 
-        $grid->id('ID')->sortable();
-        $grid->image('封面圖片')->image();
-        $grid->title('商品名稱');
-        $grid->on_sale('上架狀態')->display(function ($value) {
-            return $value
-                ? '<span class="label label-success">已上架</span>'
-                : '<span class="label label-danger">未上架</span>';
+        $grid->column('goods_image_url', '商品图片')->image()->width(200);
+        $grid->goods_name('商品名称')->display(function ($name){
+            $href ='http://'.env('PDD_GOODS_LINK').$this->goods_id;
+            return '<a target ="__blank" href ="'.$href.'"</a>'.$name.'</a>';
+        })->width(500);
+        $grid->min_group_price('价格')->display(function ($amount) {
+            return round($amount / 100, 2) . '元';
         });
-        $grid->price('價格')->display(function ($price) {
-            return '$' . $price;
-        });
-        $grid->rating('評分');
-        $grid->sold_count('銷量');
-        $grid->review_count('評論數');
 
+        $grid->column('min_price', '券后价')->display(function (){
+
+            $amount = $this->min_group_price- $this->coupon_discount;
+            return round($amount / 100, 2) . '元';
+        });
+
+        $grid->column('promotion', '佣金')->display(function (){
+            $amount = $this->min_group_price- $this->coupon_discount;
+
+            $pddPromotion = round($amount * $this->promotion_rate / 1000, 2);
+
+            return round($pddPromotion / 100, 2) . '元';
+        });
+        $grid->sales_tip('销量');
+        $grid->mall_name('店铺名称');
+
+        $grid->filter(function ($filter) {
+
+            // 去掉默认的id过滤器
+            $filter->disableIdFilter();
+
+            // 在这里添加字段过滤器
+            $filter->equal('search', '搜索');
+
+        });
+        $grid->disableBatchActions();
+        $grid->disableCreateButton();
+        $grid->disableExport();
         $grid->actions(function ($actions) {
-            $actions->disableView();
-            $actions->disableDelete();
+            $actions->disableView();   // 不在每一行後面展示查看按鈕
+            $actions->disableDelete(); // 不在每一行後面展示刪除按鈕
+            $actions->disableEdit();   // 不在每一行後面展示編輯按鈕
+            $actions->add(new Select);
         });
 
-        $grid->tools(function ($tools) {
-            $tools->batch(function ($batch) {
-                $batch->disableDelete();
-            });
-        });
+
+
+
+//        foreach ($list as $key => $val) {
+//            $res[$key]['goods_id'] = $val['goods_id'];
+//            $res[$key]['has_coupon'] = $val['has_coupon'];
+//            $res[$key]['coupon_remain_quantity'] = $val['coupon_remain_quantity'];
+//            $res[$key]['goods_name'] = $val['goods_name'];
+//            $res[$key]['mall_name'] = mb_substr($val['mall_name'], 0, 7);
+//            $res[$key]['sales_tip'] = $val['sales_tip'];
+//            $res[$key]['search_id'] = $val['search_id'];
+//            $res[$key]['goods_image_url'] = $val['goods_image_url'];
+//
+//            $minPrice = $val['min_group_price'] - $val['coupon_discount'];
+//            $pddPromotion = round($minPrice * $val['promotion_rate'] / 1000, 2);
+//            $res[$key]['promotion'] = round($pddPromotion / 100, 2);
+//
+//            $res[$key]['min_group_price'] = round($val['min_group_price'] / 100, 2);
+//            $res[$key]['min_normal_price'] = round($val['min_normal_price'] / 100, 2);
+//            $res[$key]['coupon_discount'] = intval($val['coupon_discount'] / 100);
+//            $res[$key]['min_price'] = round($minPrice / 100, 2);
+//        }
 
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param  int  $id
-     * @return \Encore\Admin\Show
-     */
-    protected function detail($id)
-    {
-        $show = new Show(Product::findOrFail($id));
+    protected function  edit(Product $product){
+        dd($product);
 
-        $show->id('ID');
-        $show->title('商品名稱');
-        $show->image('封面圖片')->image();
-        $show->description('商品介紹')->unescape();
-        $show->on_sale('是否上架')->unescape()->as(function ($value) {
-            return $value
-                ? '<span class="label label-success">已上架</span>'
-                : '<span class="label label-danger">未上架</span>';
-        });
-        $show->price('價格')->as(function ($price) {
-            return '$' . $price;
-        });
-        $show->rating('評分');
-        $show->sold_count('銷量');
-        $show->review_count('評論數');
-        $show->created_at('新增日期');
-
-        return $show;
     }
 
-    /**
-     * Make a form view.
-     *
-     * @param  int  $id
-     * @return \Illuminate\View\View
-     */
-    protected function form($id = null)
+    protected function form()
     {
-        $product = Product::firstOrNew(compact('id'));
+        $form = new Form(new Product());
 
-        return view('admin.products.form', compact('product'));
+        $form->text('infos', 'infos');
+
+        return $form;
     }
 
-    /**
-     * Save product.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int|null  $id
-     * @return \App\Models\Product
-     */
-    protected function save(Request $request, $id = null)
-    {
-        $data = $request->only(['title', 'image', 'description', 'on_sale', 'price']);
-        $attrs = collect($request->input('attrs'));
-        $skus = collect($request->input('skus'));
-
-        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-            $imagePath = $data['image']->store(
-                config('admin.upload.directory.image'),
-                ['disk' => config('admin.upload.disk')]
-            );
-            $data['image'] = Storage::disk(config('admin.upload.disk'))->url($imagePath);
-        }
-
-        $data['on_sale'] = is_string($data['on_sale']) ? $data['on_sale'] === 'on' : $data['on_sale'];
-
-        // Update or create porduct
-        /** @var \App\Models\Product $product */
-        $product = Product::updateOrCreate(['id' => $id], $data);
-
-        // Clear old product attributes
-        $product->attrs->map->delete();
-
-        // Create new product attributes
-        $attrs->each(function ($attr) use ($product) {
-            $product->attrs()->create($attr);
-        });
-
-        // Remove deleted input skus
-        $originalAttrItemsIndex = $product->skus->map->attr_items_index->toBase();
-        $skusAttrItemsIndex = $skus->map(function ($sku) {
-            return $sku['attr_items_index'];
-        });
-        $diffSkuAttrItemsIndex = $originalAttrItemsIndex->diff($skusAttrItemsIndex);
-        $product->skus()->whereIn('attr_items_index', $diffSkuAttrItemsIndex)->delete();
-
-        $product->refresh();
-        $originalAttrItemsIndex = $product->skus->map->attr_items_index;
-
-        // Update product skus
-        $updateSkus = $skus->whereIn('attr_items_index', $originalAttrItemsIndex);
-        $updateSkus->each(function ($sku) use ($product) {
-            $product->skus()->where('attr_items_index', $sku['attr_items_index'])->update($sku);
-        });
-
-        // Create new product skus
-        $diffSkuAttrItemsIndex = $skusAttrItemsIndex->diff($originalAttrItemsIndex);
-        $newSkus = $skus->whereIn('attr_items_index', $diffSkuAttrItemsIndex);
-        $newSkus->each(function ($sku) use ($product) {
-            $product->skus()->create($sku);
-        });
-
-        // Update product price
-        $minPrice = $skus->min('price');
-        if (!is_null($minPrice)) {
-            $product->update(['price' => $minPrice]);
-        }
-
-        return $product;
-    }
 }

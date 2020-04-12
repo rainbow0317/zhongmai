@@ -26,4 +26,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+    }
+
+
+    public function invites()
+    {
+        return $this->hasMany(Invite::class,'user_id','id')->where('invite_promotion.status',Invite::STATUS_FINISH);
+    }
 }

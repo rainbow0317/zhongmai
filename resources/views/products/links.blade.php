@@ -101,8 +101,8 @@
                 </div>
             </div>
         @endforeach
-        {{--<div style="opacity:0">--}}
-            <div id="foo" style="opacity:0" value=""></div>
+        {{--<div style="">--}}
+            <div id="foo" style="opacity:0"></div>
     {{--</div>--}}
 
 
@@ -114,7 +114,7 @@
         </div>
     @endif
 
-    <div class="my-3">{!! $products->appends(request()->input())->links() !!}</div>
+    <div class="my-3" >{!! $products->appends(request()->input())->links() !!}</div>
     @endcard
 
 @endsection
@@ -148,8 +148,14 @@
 
             axios.post('{{ route('products.share')}}', data).then(function (result) {
 
-                infos =  product.goods_name +'<br>原价:' + product.min_group_price + ' 元<br/>券后价:' + product.min_price + ' 元<br/ >'
-                    + '抢购链接:<a href="'+ result.data.short_url+'">' + result.data.short_url+'</a>';
+                if (product.text){
+                    infos = product.text
+                        + '<br> 抢购链接:<a href="'+ result.data.short_url+'">' + result.data.short_url+'</a>';
+                } else{
+                    infos =  product.goods_name +'<br>原价:' + product.min_group_price + ' 元<br/>券后价:' + product.min_price + ' 元<br/ >'
+                        + '抢购链接:<a href="'+ result.data.short_url+'">' + result.data.short_url+'</a>';
+                }
+
                 $("#foo").html(infos);
 
                infos = infos +'<br><button class="copy btn btn-light" data-clipboard-target="#foo">点击复制文案</button> '
@@ -163,7 +169,11 @@
 
 
             }).catch(function (error) {
-                if (error.response.msg) {
+                if (error.response.status === 401) {
+                    swal('請先登入', '', 'error').then(function () {
+                        location.href = '{{ route('login') }}'
+                    })
+                } else if (error.response.msg) {
                     swal(error.response.msg, '', 'error')
                 } else {
                     swal('系统错误', '', 'error')

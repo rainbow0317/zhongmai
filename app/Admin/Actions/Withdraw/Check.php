@@ -16,12 +16,12 @@ class Check extends RowAction
         // 获取到表单中的`type`值
         $type = $request->get('type');
 
-        if ($type !=0){
+        if ($model->status != 0) {
             return $this->response()->error('请勿重复处理');
         }
 
         //更新
-        $model->where('id',$model->id)->update(['status' => $type]);
+        $model->where('id', $model->id)->update(['status' => $type]);
 
         admin_toastr(__('更新成功'));
         return $this->response()->success('提现处理完成')->refresh();

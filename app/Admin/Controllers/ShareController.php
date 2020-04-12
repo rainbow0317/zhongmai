@@ -100,7 +100,7 @@ class ShareController extends Controller
             $filter->disableIdFilter();
 
             // 在这里添加字段过滤器
-            $filter->like('user_id', '用户id');
+            $filter->equal('user_id', '用户id');
 
         });
         return $grid;

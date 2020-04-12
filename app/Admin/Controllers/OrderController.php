@@ -34,54 +34,6 @@ class OrderController extends Controller
             ->description('description')
             ->body($this->grid());
     }
-
-    /**
-     * Show interface.
-     *
-     * @param Order $order
-     * @param Content $content
-     * @return Content
-     */
-    public function show(Order $order, Content $content)
-    {
-        return $content
-            ->header('查看訂單')
-            ->description('description')
-            ->body(view('admin.orders.show', ['order' => $order]));
-    }
-
-    /**
-     * 發貨
-     *
-     * @param Order $order
-     * @param Request $request
-     * @return void
-     */
-    public function ship(Order $order, Request $request)
-    {
-        if (!$order->paid_at) {
-            throw new InvalidRequestException('該訂單尚未付款');
-        }
-        if ($order->ship_status !== Order::SHIP_STATUS_PENDING) {
-            throw new InvalidRequestException('該訂單尚已發貨');
-        }
-
-        $data = $request->validate([
-            'express_company' => ['required'],
-            'express_no' => ['required'],
-        ], [], [
-            'express_company' => '物流公司',
-            'express_no' => '物流單號',
-        ]);
-
-        $order->update([
-            'ship_status' => Order::SHIP_STATUS_DELIVERED,
-            'ship_data' => $data,
-        ]);
-
-        return redirect()->back();
-    }
-
     /**
      * Make a grid builder.
      *
@@ -104,18 +56,18 @@ class OrderController extends Controller
             return
                 '<p>用户id : '.$user_id.'</p><p>手机号 : '.Arr::get($users,$user_id,'').'</p>';
 
-    });
+    })->sortable();
         $grid->column('order.goods_name', '商品名称');
 
         $grid->column('order.order_amount', '订单金额')->display(function ($amount) {
-            return round($amount/100,2);
+            return round($amount/100,2).'元';
         })->sortable();
         $grid->column('order.goods_quantity', '订单数量');
         $grid->column('order.actual_promotion_amount', '拼多多实际佣金')->display(function ($amount) {
-            return round($amount/100,2);
+            return round($amount/100,2).'元';
         })->sortable();
         $grid->benefit('推广人佣金')->display(function ($amount) {
-            return round($amount/100,2);
+            return round($amount/100,2).'元';
         })->sortable();
         $grid->type('佣金类型')->using([1 => '直接抽佣',2=>'上级抽佣']);
 
@@ -129,7 +81,7 @@ class OrderController extends Controller
             $filter->disableIdFilter();
 
             // 在这里添加字段过滤器
-            $filter->like('user_id', '用户id');
+            $filter->equal('user_id', '用户id');
 
         });
         $grid->disableBatchActions();
@@ -140,39 +92,4 @@ class OrderController extends Controller
         return $grid;
     }
 
-    public function handleRefund(Order $order, HandleRefundRequest $request)
-    {
-        if ($order->refund_status !== Order::REFUND_STATUS_APPLIED) {
-            throw new InvalidRequestException('訂單狀態不正確');
-        }
-
-        if ($request->input('agree')) {
-            switch ($order->payment_method) {
-                case 'website':
-                    $refundNo = Order::getAvailableRefundNo();
-
-                    // 退款成功
-                    $order->update([
-                        'refund_no' => $refundNo,
-                        'refund_status' => Order::REFUND_STATUS_SUCCESS,
-                    ]);
-
-                    break;
-
-                default:
-                    throw new InternalException('未知訂單支付方式：' . $order->payment_method);
-                    break;
-            }
-        } else {
-            $extra = $order->extra ? : [];
-            $extra['refund_disagree_reason'] = $request->input('reason');
-
-            $order->update([
-                'refund_status' => Order::REFUND_STATUS_PENDING,
-                'extra' => $extra,
-            ]);
-        }
-
-        return $order;
-    }
 }
