@@ -82,8 +82,16 @@ class OrderController extends Controller
 
             // 在这里添加字段过滤器
             $filter->equal('user_id', '用户id');
+            $filter->between('created_at', '订单日期')->date();
+
+//            $filter->between('created_at', '订单日期')->date();
+//            $filter->gt('created_at', '查询开始日期')->date();
+//            $filter->lt('created_at', '查询结束日期')->date();
+//            $filter->lt('created_at', '查询结束日期')->datetime();
 
         });
+
+
         $grid->disableBatchActions();
         $grid->disableCreateButton();
         $grid->disableActions();

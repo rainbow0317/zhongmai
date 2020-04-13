@@ -35,10 +35,15 @@ class SelectController extends AdminController
         $grid->column('text','商品分享文案');
         $grid->disableBatchActions();
         $grid->disableCreateButton();
-        $grid->disableActions();
-        $grid->disableExport();
 
+        $grid->disableExport();
         $grid->disableFilter();
+
+        $grid->actions(function ($actions) {
+            $actions->disableView();   // 不在每一行後面展示查看按鈕
+            $actions->disableEdit();   // 不在每一行後面展示編輯按鈕
+        });
+
 
         return $grid;
     }
