@@ -63,7 +63,7 @@ class ProductController extends Controller
                 $selectList = Selects::orderBy('id', 'desc')->limit(16)->get()->toArray();
             }
 
-            if ($selectList) {
+            if (empty($selectList)) {
                 $list = array_merge($selectList, $list);
             }
 

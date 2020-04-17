@@ -33,8 +33,8 @@ class SelectController extends AdminController
         $grid->column('goods_name', '商品名称');
 
         $grid->column('text','商品分享文案');
-        $grid->disableBatchActions();
-        $grid->disableCreateButton();
+//        $grid->disableBatchActions();
+        $grid->disableCreateButgitton();
 
         $grid->disableExport();
         $grid->disableFilter();
