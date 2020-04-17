@@ -64,10 +64,11 @@ class ProductController extends Controller
             }
 
             if (!empty($selectList)) {
+                $selectList = Arr::pluck($selectList, null, 'goods_id');
                 $list = array_merge($selectList, $list);
             }
 
-            $selectList = Arr::pluck($selectList, null, 'goods_id');
+
 
             $res = [];
             foreach ($list as $key => $val) {
