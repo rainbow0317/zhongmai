@@ -58,6 +58,7 @@ class ProductController extends Controller
             $contents = Arr::get($client->getRes($request), 'goods_search_response', []);
             $list = Arr::get($contents, 'goods_list', []);
 
+            $selectList = [];
             //选品获取
             if (empty($filter) && $current_page == 1) {
                 $selectList = Selects::orderBy('id', 'desc')->limit(16)->get()->toArray();
@@ -67,7 +68,6 @@ class ProductController extends Controller
                 $selectList = Arr::pluck($selectList, null, 'goods_id');
                 $list = array_merge($selectList, $list);
             }
-
 
 
             $res = [];
