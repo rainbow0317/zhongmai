@@ -41,7 +41,7 @@ class SelectController extends AdminController
 
         $grid->actions(function ($actions) {
             $actions->disableView();   // 不在每一行後面展示查看按鈕
-            $actions->disableEdit();   // 不在每一行後面展示編輯按鈕
+//            $actions->disableEdit();   // 不在每一行後面展示編輯按鈕
         });
 
 

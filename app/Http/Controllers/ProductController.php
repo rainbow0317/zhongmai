@@ -59,7 +59,9 @@ class ProductController extends Controller
             $list = Arr::get($contents, 'goods_list', []);
 
             //选品获取
-            $selectList = Selects::orderBy('id', 'desc')->limit(16)->get()->toArray();
+            if (empty($filter) && $current_page == 1) {
+                $selectList = Selects::orderBy('id', 'desc')->limit(16)->get()->toArray();
+            }
 
             if ($selectList) {
                 $list = array_merge($selectList, $list);
