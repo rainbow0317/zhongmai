@@ -35,7 +35,13 @@ class ProductController extends Controller
             $total = 1000000;//商品总数(分页用,不知道三方有多少商品,所以不显示最后几页,所以总数写的大一些)
 
             //是否团长 未登录按团长显示
-            $leaderFlag = Auth::user() ? Auth::user()->level_relation : 1;
+            $user = Auth::user();
+            if ($user) {
+                $leaderFlag = Auth::user()->level_relation == 0 ? 1 : 0;
+            } else {
+                $leaderFlag = 1;
+            }
+
             //直接抽佣比例
             $rate = config('pdd.promotion_rate');
             //上级抽佣比例
